@@ -1,6 +1,4 @@
-from calculate import allin1csv
 import matplotlib.pyplot as plt
-from datetime import datetime
 
 def draw_hr(data):
     # ti=[]
@@ -18,8 +16,8 @@ def draw_hr(data):
     pass
 
 if __name__ == '__main__':
-    whs_path = 'D:\\chenchen2\\桌面\\力量训练\\2022-08-11T08_25_16.445Z.tcx'
-    polar_path = 'D:\\chenchen2\\桌面\\力量训练\\Lct_3_2022-08-11_16-25-11.tcx'
+    whs_path = 'D:\\桌面\\力量训练\\2022-08-11T08_25_16.445Z.tcx'
+    polar_path = 'D:\\桌面\\力量训练\\Lct_3_2022-08-11_16-25-11.tcx'
     print(whs_path[0:-28])
     # whs=allin1csv(whs_path, polar_path)
     # draw_hr(whs)

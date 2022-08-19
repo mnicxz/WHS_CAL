@@ -1,4 +1,5 @@
 '''
+1.5 更新tcx元素定位xpath方法, 解决了GPS LT问题, 解决数据时间不匹配导致的无法计算问题
 1.4 解决了绘图bug
 1.3 更新whs_cal图标
 1.2 增加csv文件导出、心率折线图绘制选项, 设置文件路径输入框长度, 导出csv文件与加载tcx文件在一个目录下py
@@ -67,7 +68,7 @@ def get_result():
     pass
 
 win = Tk()
-win.title(string='WHS辅助计算1.4')
+win.title(string='WHS辅助计算1.5')
 # win.geometry('{}x{}+{}+{}'.format(420,200,20,20))
 
 
