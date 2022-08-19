@@ -22,29 +22,22 @@ def allin1csv(whs_path, polar_path):
     whs = pd.DataFrame(whs_tp)
     polar = pd.DataFrame(polar_tp)
 
-    # print(whs['Time'][1])k
-    tmp = []
-    k = 0
+    tmp = {'PolarHR':[]}
+    k,t = 0,0
     for i in range(len(whs['Time'])):
-        # print("whs['Time']:",whs['Time'][i])
-        # tmp.append('NaN')
-        for j in range(len(polar['Time'])-k):
-            j=j+k
-            # print("polar['Time']:",polar['Time'][j])
+        for j in range(k,len(polar['Time'])):
             if whs['Time'][i] == polar['Time'][j]:
-                # tmp[i] = polar['HeartRateBpm'][j]
-                tmp.append(polar['HeartRateBpm'][j])
+                tmp['PolarHR'].append(polar['HeartRateBpm'][j])
+                t=j
                 k = j+1
                 break
-    # print(len(tmp))
-    whs.insert(8, 'PolarHR', tmp)
-    # print(whs)
-
-    # filename='WHS_{}.csv'.format(datetime.strftime(timezone_change(whs['Time'][0]),"%Y-%m-%d_%H-%M-%S"))
-    # # print(whs)
-    # whs.to_csv(filename)
-    return whs
-    pass
+    
+    pt=pd.DataFrame(tmp)
+    # print(pt)
+    
+    csv=pd.concat([whs,pt],axis=1)
+    # print(type(csv['PolarHR'][614]))
+    return csv
 
 def cal(whs):
     hr_lap=[]
@@ -52,35 +45,30 @@ def cal(whs):
     # HR Lock Time
     for i in range(len(whs)):
         if whs['HeartRateBpm'][i] != 0:
-            # print('HR Lock Time:', i)
-            # hr.append(i)
-            dic['hr_lock_time']=i
+            dic['hr_lock_time']=whs['Time'][i]-whs["Time"][0]
             break
 
     # HR AE & APE
-    for j in range(len(whs)-i):
-        # polar hr 为0时异常处理
-        if whs['PolarHR'][j+i] != 0:    
-        # if whs['HeartRateBpm'][j+i] !='NaN' | whs['HeartRateBpm'][j+i] !='NaN':
-            hr_ae=abs(int(whs['HeartRateBpm'][j+i])-int(whs['PolarHR'][j+i]))
-            hr_lap.append(hr_ae)
-            sum_lap=sum_lap+hr_ae
-            hr_ape=hr_ae/whs['PolarHR'][j+i]
-            sum_ape=sum_ape+hr_ape
-        pass
+    for j in range(i,len(whs)):
+        # 在whs和polar都有数据时取值计算
+        if not pd.isna(whs['HeartRateBpm'][j]) and not pd.isna(whs['PolarHR'][j]):
+            # polar hr 为0时异常处理
+            if int(whs['PolarHR'][j]) != 0:    
+                hr_ae=abs(int(whs['HeartRateBpm'][j])-int(whs['PolarHR'][j]))
+                hr_lap.append(hr_ae)
+                sum_lap=sum_lap+hr_ae
+                hr_ape=hr_ae/whs['PolarHR'][j]
+                sum_ape=sum_ape+hr_ape
+            pass
     # print("HR AE:", sum_lap/len(hr_lap))
     # print("HR APE:{:.2%}".format(sum_ape/len(hr_lap)))
-    dic['hr_ae']='{:.2}'.format(sum_lap/len(hr_lap))
+    dic['hr_ae']=round(sum_lap/len(hr_lap),2)
     dic['hr_ape']='{:.2%}'.format(sum_ape/len(hr_lap))
-    # hr.append(sum_lap/len(hr_lap))
-    # hr.append('{:.2%}'.format(sum_ape/len(hr_lap)))
 
     # GPS Lock Time
-    for i in range(len(whs)):
-        if whs['LongitudeDegrees'][i] != 0:
-            # print('HR Lock Time:', i)
-            # hr.append(i)
-            dic['gps_lock_time']=i
+    for k in range(len(whs)):
+        if whs['LatitudeDegrees'][k] != 0:
+            dic['gps_lock_time']=whs['Time'][k]-whs["Time"][0]
             break
 
     # WHS STEPS
@@ -95,10 +83,9 @@ def cal(whs):
 
 if __name__ == '__main__':
 
-    whs_path = 'D:\\chenchen2\\桌面\\力量训练\\2022-08-11T08_25_16.445Z.tcx'
-    polar_path = 'D:\\chenchen2\\桌面\\力量训练\\Lct_3_2022-08-11_16-25-11.tcx'
+    whs_path = 'D:\\室内跑步\\2022-08-16T02_53_22.373Z.tcx'
+    polar_path = 'D:\\室内跑步\\Lct_3_2022-08-16_10-53-05.TCX'
 
     whs=allin1csv(whs_path, polar_path)
     print(cal(whs))
-    # whs.to_csv('site.csv')
     pass

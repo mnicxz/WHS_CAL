@@ -67,8 +67,8 @@ def whs_tcx2csv(path):
         tp_time = datetime.strptime(tp[0].text[0:-1], "%Y-%m-%dT%H:%M:%S")
         if tp_time >= start_time:
             trackpoint['Time'].append(tp_time)
-            trackpoint['LatitudeDegrees'].append(tp[1][0].text)
-            trackpoint['LongitudeDegrees'].append(tp[1][1].text)
+            trackpoint['LatitudeDegrees'].append(float(tp[1][0].text))
+            trackpoint['LongitudeDegrees'].append(float(tp[1][1].text))
             trackpoint['AltitudeMeters'].append(tp[2].text)
             trackpoint['DistanceMeters'].append(tp[3].text)
             trackpoint['HeartRateBpm'].append(int(float(tp[4][0].text)))
@@ -80,7 +80,7 @@ def whs_tcx2csv(path):
 
 
 if __name__ == '__main__':
-    path = 'D:\\chenchen2\\桌面\\力量训练\\2022-08-11T08_25_16.445Z.tcx'
+    path = 'D:\\桌面\\Running\\2022-08-15T13_31_47.276Z.tcx'
     print("开始时间：", whs_start_time(path))
     trackpoint = whs_tcx2csv(path)
     whs = pd.DataFrame(trackpoint)

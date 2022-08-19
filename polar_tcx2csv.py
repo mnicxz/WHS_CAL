@@ -1,32 +1,35 @@
 from datetime import datetime
 from lxml import etree
-# from whs_tcx2csv import timezone_change
 import pandas as pd
 
-trackpoint = {'Time': [],  'HeartRateBpm': []}
+NSMAP={"tcd":"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"}
 
 
 def polar_tcx2csv(path):
     trackpoint = {'Time': [],  'HeartRateBpm': []}
+    i=2
 
     polar=etree.parse(path)
     root=polar.getroot()
-    # for node in root.getchildren():
-    #     print(node)
-    for tp in root[0][0][1][7]:
-        # tmp_time = datetime.strptime(tp[0].text[0:-5], "%Y-%m-%dT%H:%M:%S")
-        trackpoint['Time'].append(datetime.strptime(tp[0].text[0:-5], "%Y-%m-%dT%H:%M:%S"))
-        trackpoint['HeartRateBpm'].append(int(tp[1][0].text))
-        # print(tp[0].text)
-        # print(tp)
+
+    # Time
+    for ti in root.xpath('.//tcd:Time',namespaces=NSMAP):
+        trackpoint['Time'].append(datetime.strptime(ti.text[0:-5], "%Y-%m-%dT%H:%M:%S"))
+    # 前两个Value值为平均心率及最大心率，需要去除
+    for hr in root.xpath('.//tcd:Value',namespaces=NSMAP):
+        if i ==0:
+            trackpoint['HeartRateBpm'].append(int(hr.text))
+        else:
+            i=i-1
+        # print(hr.text)
     return trackpoint
     pass
 
 
 if __name__ == '__main__':
-    path = 'D:\\chenchen2\\桌面\\力量训练\\Lct_3_2022-08-11_16-25-11.tcx'
+    path = 'D:\\桌面\\20 xyw\\running\\Lct_1_2022-08-17_16-28-11.TCX'
     trackpoint=polar_tcx2csv(path)
     polar=pd.DataFrame(trackpoint)
-    print("tcx数据如下:\n", polar)
+    # print("tcx数据如下:\n", polar)
     # polar.to_csv('hr.csv')
     pass
