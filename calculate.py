@@ -83,8 +83,8 @@ def cal(whs):
 
 if __name__ == '__main__':
 
-    whs_path = 'D:\\室内跑步\\2022-08-16T02_53_22.373Z.tcx'
-    polar_path = 'D:\\室内跑步\\Lct_3_2022-08-16_10-53-05.TCX'
+    whs_path = 'D:\\户外快跑\\2022-08-15T12_03_55.407Z.tcx'
+    polar_path = 'D:\\户外快跑\\Lct_3_2022-08-15_20-02-34.TCX'
 
     whs=allin1csv(whs_path, polar_path)
     print(cal(whs))

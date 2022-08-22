@@ -12,22 +12,24 @@ def polar_tcx2csv(path):
     polar=etree.parse(path)
     root=polar.getroot()
 
-    # Time
-    for ti in root.xpath('.//tcd:Time',namespaces=NSMAP):
-        trackpoint['Time'].append(datetime.strptime(ti.text[0:-5], "%Y-%m-%dT%H:%M:%S"))
-    # 前两个Value值为平均心率及最大心率，需要去除
-    for hr in root.xpath('.//tcd:Value',namespaces=NSMAP):
-        if i ==0:
-            trackpoint['HeartRateBpm'].append(int(hr.text))
+    # trackpoint
+    for tp in root.xpath('.//tcd:Trackpoint',namespaces=NSMAP):
+        # Time
+        for ti in tp.xpath('.//tcd:Time',namespaces=NSMAP):
+            trackpoint['Time'].append(datetime.strptime(ti.text[0:-5], "%Y-%m-%dT%H:%M:%S"))
+        # HeartRateBpm, Polar心率消失时赋0处理
+        if len(tp.xpath('.//tcd:Value',namespaces=NSMAP)) == 0:
+            trackpoint['HeartRateBpm'].append(0)
         else:
-            i=i-1
-        # print(hr.text)
+            for hr in tp.xpath('.//tcd:Value',namespaces=NSMAP):
+                trackpoint['HeartRateBpm'].append(int(hr.text))
+            pass
+    
     return trackpoint
-    pass
 
 
 if __name__ == '__main__':
-    path = 'D:\\桌面\\20 xyw\\running\\Lct_1_2022-08-17_16-28-11.TCX'
+    path = 'D:\\户外快跑\\Lct_3_2022-08-15_20-02-34.TCX'
     trackpoint=polar_tcx2csv(path)
     polar=pd.DataFrame(trackpoint)
     # print("tcx数据如下:\n", polar)
