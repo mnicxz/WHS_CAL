@@ -1,4 +1,5 @@
 '''
+1.6 解决了polar心率无数据时的异常
 1.5 更新tcx元素定位xpath方法, 解决了GPS LT问题, 解决数据时间不匹配导致的无法计算问题
 1.4 解决了绘图bug
 1.3 更新whs_cal图标
@@ -68,7 +69,7 @@ def get_result():
     pass
 
 win = Tk()
-win.title(string='WHS辅助计算1.5')
+win.title(string='WHS辅助计算1.6')
 # win.geometry('{}x{}+{}+{}'.format(420,200,20,20))
 
 
