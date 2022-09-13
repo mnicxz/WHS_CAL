@@ -7,7 +7,6 @@ NSMAP={"tcd":"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"}
 
 def polar_tcx2csv(path):
     trackpoint = {'Time': [],  'HeartRateBpm': []}
-    i=2
 
     polar=etree.parse(path)
     root=polar.getroot()
@@ -29,7 +28,7 @@ def polar_tcx2csv(path):
 
 
 if __name__ == '__main__':
-    path = 'D:\\户外快跑\\Lct_3_2022-08-15_20-02-34.TCX'
+    path = 'D:\\chenchen2\\桌面\\Tester10-zj-female-Fitzpatrick Type II-BMI Normal\\户外快跑\\Lct_3_2022-08-15_20-02-34.TCX'
     trackpoint=polar_tcx2csv(path)
     polar=pd.DataFrame(trackpoint)
     # print("tcx数据如下:\n", polar)

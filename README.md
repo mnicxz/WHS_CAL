@@ -6,6 +6,8 @@
 * 计算Steps APE
 
 ### RELEASENOTE
+* 2.0 添加step path, actigraphy steps数据整合,移除结果层
+* 1.8 添加gtx path, gps数据整合
 * 1.6 解决了polar心率无数据时的异常
 * 1.5 更新tcx元素定位xpath方法, 解决了GPS LT问题, 解决数据时间不匹配导致的无法计算问题
 * 1.4 解决了绘图bug
