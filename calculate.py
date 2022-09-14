@@ -183,15 +183,14 @@ def cal2(whs):
                 break
 
         # WHS GPS Lock Time
-            for k in range(len(whs)):
-                if whs['LatitudeDegrees'][k] != 0:
-                    gps_start_time = datetime.strptime(
-                        whs['Time'][k], "%Y-%m-%d %H:%M:%S")
-                    dic['gps_start_time'] = gps_start_time
-                    print(dic['gps_start_time'],type(dic['gps_start_time']))
-                    print(gps_start_time,type(gps_start_time))
-                    dic['gps_lock_time'].append(gps_start_time-start_time)
-                    break
+        for k in range(len(whs)):
+            if whs['LatitudeDegrees'][k] != 0:
+                gps_start_time = datetime.strptime(whs['Time'][k], "%Y-%m-%d %H:%M:%S")
+                dic['gps_start_time'] = gps_start_time
+                print(dic['gps_start_time'],type(dic['gps_start_time']))
+                print(gps_start_time,type(gps_start_time))
+                dic['gps_lock_time'].append(gps_start_time-start_time)
+                break
 
         # WHS STEPS
         dut_steps = int(whs['Steps'][len(whs['Steps'])-1])

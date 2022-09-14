@@ -246,7 +246,7 @@ class whs:
             # 直接显示GPS相关数据: GPS Lock Time、DUT distance、GT distance、Distance APE
             if 'GPSLat' in csv.columns:
                 whs_log.info('GPS lock time: {}\nDUT distance: {}\nGT distance: {}\nDistance APE: {:.2%}'.format(
-                    data['gps_lock_time'][i], round(data['dut_dis'], 2), round(data['gt_dis'], 2), data['gps_ape'][0]))
+                    data['gps_lock_time'][i], round(data['dut_dis'], 2), round(data['gt_dis'], 2), data['gps_ape'][i]))
             # 直接显示STEP相关数据: DUT steps、GT steps、Steps APE
             if 'ActiTime' in csv.columns:
                 whs_log.info('DUT steps: {}\nGT steps: {}\nSTEP APE: {:.2%}'.format(
@@ -256,8 +256,9 @@ class whs:
             whs = pd.concat([whs, csv])
             i = i+1
             pass
-
-        whs.insert(len(whs.columns), 'Track Accuracy AE', data['gps_ae'])
+        
+        if 'GPSLat' in csv.columns:
+            whs.insert(len(whs.columns), 'Track Accuracy AE', data['gps_ae'])
         whs.insert(len(whs.columns), 'HR AE', data['hr_ae'])
         whs.insert(len(whs.columns), 'HR APE', data['hr_ape'])
         whs_log.info('\n***{} file added***\n\n'.format(len(filenames)))
@@ -267,7 +268,7 @@ class whs:
         # print(whs['Track Accuracy AE'].quantile(0.9))
 
         protocol_csv_name=protocol_combobox.get()
-        whs.to_csv('{}.csv'.format(protocol_csv_name))
+        whs.to_csv('{}\{}.csv'.format(show_dic_path.get(),protocol_csv_name))
         whs_log.info('\n***{}\{}.csv***\n\n'.format(os.path.dirname(__file__),protocol_csv_name))
 
         pass
@@ -275,7 +276,7 @@ class whs:
 
 if __name__ == '__main__':
     win = Tk()
-    win.title(string='WHS辅助计算2.0')
+    win.title(string='WHS辅助计算2.0.3')
 
     show_wear_path, show_gps_path, show_polar_path, show_step_path, show_dic_path = StringVar(
     ), StringVar(), StringVar(), StringVar(), StringVar()

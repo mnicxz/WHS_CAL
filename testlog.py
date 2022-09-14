@@ -15,6 +15,7 @@ class App:
     def btn_command():
         now=datetime.datetime.now()
         log.info('*{}*'.format(now))
+        log.error('error')
         pass
 
 if __name__ =='__main__':
@@ -24,7 +25,7 @@ if __name__ =='__main__':
     normalTextBox=tk.Text(root,width=50,height=5).pack()
     normalTextBox.pack()
     log=logging.getLogger('log')
-    log.setLevel(logging.INFO)
+    # log.setLevel(logging.INFO)
     handler=TextboxHander(normalTextBox)
     log.addHandler(handler)
     root.mainloop()

@@ -24,28 +24,28 @@ def cal_dis(lat1,lon1,lat2,lon2):
     return dis
 
 def getDistance(latA, lonA, latB, lonB):
-    # if latA == latB and lonA == lonB:
-    #     distance=0
-    # else:
-    try:
-        ra = 6378140 # radius of equator: meter
-        rb = 6356755 # radius of polar: meter
-        flatten = (ra - rb) / ra # Partial rate of the earth
-        # change angle to radians
-        radLatA = radians(latA)
-        radLonA = radians(lonA)
-        radLatB = radians(latB)
-        radLonB = radians(lonB)
-        
-        pA = atan(rb / ra * tan(radLatA))
-        pB = atan(rb / ra * tan(radLatB))
-        x = acos(sin(pA) * sin(pB) + cos(pA) * cos(pB) * cos(radLonA - radLonB))
-        c1 = (sin(x) - x) * (sin(pA) + sin(pB))**2 / cos(x / 2)**2
-        c2 = (sin(x) + x) * (sin(pA) - sin(pB))**2 / sin(x / 2)**2
-        dr = flatten / 8 * (c1 - c2)
-        distance = ra * (x + dr)
-    except:
+    if latA == latB and lonA == lonB:
         distance=0
+    else:
+        try:
+            ra = 6378140 # radius of equator: meter
+            rb = 6356755 # radius of polar: meter
+            flatten = (ra - rb) / ra # Partial rate of the earth
+            # change angle to radians
+            radLatA = radians(latA)
+            radLonA = radians(lonA)
+            radLatB = radians(latB)
+            radLonB = radians(lonB)
+            
+            pA = atan(rb / ra * tan(radLatA))
+            pB = atan(rb / ra * tan(radLatB))
+            x = acos(sin(pA) * sin(pB) + cos(pA) * cos(pB) * cos(radLonA - radLonB))
+            c1 = (sin(x) - x) * (sin(pA) + sin(pB))**2 / cos(x / 2)**2
+            c2 = (sin(x) + x) * (sin(pA) - sin(pB))**2 / sin(x / 2)**2
+            dr = flatten / 8 * (c1 - c2)
+            distance = ra * (x + dr)
+        except:
+            distance=abs(int(cal_dis(latA, lonA, latB, lonB)*100000))
     return distance
 
 if __name__ == '__main__':
