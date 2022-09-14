@@ -276,7 +276,7 @@ class whs:
 
 if __name__ == '__main__':
     win = Tk()
-    win.title(string='WHS辅助计算2.0.3')
+    win.title(string='WHS辅助计算2.0.7')
 
     show_wear_path, show_gps_path, show_polar_path, show_step_path, show_dic_path = StringVar(
     ), StringVar(), StringVar(), StringVar(), StringVar()
@@ -336,7 +336,7 @@ if __name__ == '__main__':
     protocol_combobox = Combobox(
         protocol_frame, textvariable=protocol_choose, state='readonly')
     protocol_combobox['values'] = (
-        'Sedentary', 'Calibration', 'Daily Activities', 'Biking', 'Running', 'Strength Training')
+        'Sedentary', 'Calibration', 'Daily Activities', 'Indoor Running', 'Biking', 'Running', 'Strength Training')
     protocol_combobox.grid(row=0, column=0, columnspan=1, ipadx=0)
     Label(protocol_frame, text='PATH:').grid(row=0, column=1, columnspan=1)
     Entry(protocol_frame, text=show_dic_path, bd=1).grid(

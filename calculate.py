@@ -1,4 +1,6 @@
+from cmath import isnan
 from datetime import datetime
+from math import dist
 from whs_tcx2csv import whs_tcx2csv
 from polar_tcx2csv import polar_tcx2csv
 from gpx2csv import gpx2csv, getDistance
@@ -205,11 +207,11 @@ def cal2(whs):
     if 'PolarHR' in whs.columns:
         for j in range(len(whs)):
             # dut和polar都有数据且不为0时取值计算,即在dut获取到心率后开始取值计算
-            if datetime.strptime(whs['Time'][j], "%Y-%m-%d %H:%M:%S") < hr_start_time:
+            if datetime.strptime(whs['Time'][j], "%Y-%m-%d %H:%M:%S") < hr_start_time or pd.isna(whs['HeartRateBpm'][j]) or pd.isna(whs['PolarHR'][j]):
                 dic['hr_ae'].append('')
                 dic['hr_ape'].append('')
             else:
-                # polar hr 为0时异常处理
+                # polar hr 为0时异常处理、polar hr无数据
                 if int(whs['PolarHR'][j]) != 0:
                     hr_ae = abs(int(whs['HeartRateBpm'][j]) - int(whs['PolarHR'][j]))
                     dic['hr_ae'].append(hr_ae)
@@ -229,18 +231,30 @@ def cal2(whs):
     # GPS distance APE、Track Accuracy AE
     if 'GPSLat' in whs.columns:
         sumd = 0
-        # global gps_start_time
         for l in range(len(whs)-1):
-            if datetime.strptime(whs['Time'][l], "%Y-%m-%d %H:%M:%S") < gps_start_time:
+            if datetime.strptime(whs['Time'][l], "%Y-%m-%d %H:%M:%S") >= gps_start_time:
+                # GT设备无数据时，异常处理
+                if pd.isna(float(whs['GPSLat'][l+1])):
+                    for n in range(l+1,len(whs)-1): 
+                        if not pd.isna(float(whs['GPSLat'][n])):
+                            distance = getDistance(float(whs['GPSLat'][l]), float(whs['GPSLon'][l]), float(whs['GPSLat'][n]), float(whs['GPSLon'][n]))
+                            break
+                    sumd = sumd+distance
+                    continue
+                elif pd.isna(float(whs['GPSLat'][l])): 
+                    continue
+                else:
+                    distance = getDistance(float(whs['GPSLat'][l]), float(whs['GPSLon'][l]), float(whs['GPSLat'][l+1]), float(whs['GPSLon'][l+1]))
+                    sumd = sumd+distance
+            print(l,sumd)        
+        for m in range(len(whs)):
+            if datetime.strptime(whs['Time'][m], "%Y-%m-%d %H:%M:%S") < gps_start_time:
                 dic['gps_ae'].append('')
             else:
-                distance = getDistance(float(whs['GPSLat'][l]), float(whs['GPSLon'][l]), float(whs['GPSLat'][l+1]), float(whs['GPSLon'][l+1]))
-                sumd = sumd+distance
-                lap=getDistance(float(whs['LatitudeDegrees'][l]), float(whs['LongitudeDegrees'][l]), float(whs['GPSLat'][l]), float(whs['GPSLon'][l]))
+                lap=getDistance(float(whs['LatitudeDegrees'][m]), float(whs['LongitudeDegrees'][m]), float(whs['GPSLat'][m]), float(whs['GPSLon'][m]))
                 dic['gps_ae'].append(lap)    
         dic['gt_dis'] = sumd
         dic['gps_ape'].append(abs(dut_dis-sumd)/sumd)
-        dic['gps_ae'].append(getDistance(float(whs['LatitudeDegrees'][l+1]), float(whs['LongitudeDegrees'][l+1]), float(whs['GPSLat'][l+1]), float(whs['GPSLon'][l+1])))
     
     # Steps
     if 'ActiTime' in whs.columns:
