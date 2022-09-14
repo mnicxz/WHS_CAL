@@ -231,22 +231,27 @@ def cal2(whs):
     # GPS distance APE、Track Accuracy AE
     if 'GPSLat' in whs.columns:
         sumd = 0
-        for l in range(len(whs)-1):
-            if datetime.strptime(whs['Time'][l], "%Y-%m-%d %H:%M:%S") >= gps_start_time:
+        for l in range(len(whs)):
+            if datetime.strptime(whs['Time'][l], "%Y-%m-%d %H:%M:%S") > gps_start_time:
                 # GT设备无数据时，异常处理
-                if pd.isna(float(whs['GPSLat'][l+1])):
-                    for n in range(l+1,len(whs)-1): 
+                if not pd.isna(float(whs['GPSLat'][l])) and not pd.isna(float(whs['GPSLat'][l-1])):
+                    distance = getDistance(float(whs['GPSLat'][l]), float(whs['GPSLon'][l]), float(whs['GPSLat'][l-1]), float(whs['GPSLon'][l-1]))
+                    sumd = sumd+distance
+                    continue
+                elif pd.isna(float(whs['GPSLat'][l])) and not pd.isna(float(whs['GPSLat'][l-1])): 
+                    for n in range(l+1,len(whs)): 
                         if not pd.isna(float(whs['GPSLat'][n])):
-                            distance = getDistance(float(whs['GPSLat'][l]), float(whs['GPSLon'][l]), float(whs['GPSLat'][n]), float(whs['GPSLon'][n]))
+                            distance = getDistance(float(whs['GPSLat'][n]), float(whs['GPSLon'][n]), float(whs['GPSLat'][l-1]), float(whs['GPSLon'][l-1]))
                             break
                     sumd = sumd+distance
                     continue
-                elif pd.isna(float(whs['GPSLat'][l])): 
-                    continue
                 else:
-                    distance = getDistance(float(whs['GPSLat'][l]), float(whs['GPSLon'][l]), float(whs['GPSLat'][l+1]), float(whs['GPSLon'][l+1]))
-                    sumd = sumd+distance
-            print(l,sumd)        
+                # elif pd.isna(float(whs['GPSLat'][l])) and pd.isna(float(whs['GPSLat'][l-1])):
+                    continue
+                # else:
+                #     distance = getDistance(float(whs['GPSLat'][l]), float(whs['GPSLon'][l]), float(whs['GPSLat'][l+1]), float(whs['GPSLon'][l+1]))
+                #     sumd = sumd+distance
+                #         
         for m in range(len(whs)):
             if datetime.strptime(whs['Time'][m], "%Y-%m-%d %H:%M:%S") < gps_start_time:
                 dic['gps_ae'].append('')

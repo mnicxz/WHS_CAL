@@ -43,7 +43,7 @@ def getDistance(latA, lonA, latB, lonB):
             c1 = (sin(x) - x) * (sin(pA) + sin(pB))**2 / cos(x / 2)**2
             c2 = (sin(x) + x) * (sin(pA) - sin(pB))**2 / sin(x / 2)**2
             dr = flatten / 8 * (c1 - c2)
-            distance = ra * (x + dr)
+            distance = abs(ra * (x + dr))
         except:
             distance=abs(int(cal_dis(latA, lonA, latB, lonB)*100000))
     return distance
