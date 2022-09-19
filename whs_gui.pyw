@@ -270,13 +270,13 @@ class whs:
         protocol_csv_name=protocol_combobox.get()
         whs.to_csv('{}\{}.csv'.format(show_dic_path.get(),protocol_csv_name))
         whs_log.info('\n***{}\{}.csv***\n\n'.format(os.path.dirname(__file__),protocol_csv_name))
-
+        whs_log.info('Run over and please restart whs_cal...')
         pass
 
 
 if __name__ == '__main__':
     win = Tk()
-    win.title(string='WHS辅助计算2.0.7')
+    win.title(string='WHS辅助计算2.0.8')
 
     show_wear_path, show_gps_path, show_polar_path, show_step_path, show_dic_path = StringVar(
     ), StringVar(), StringVar(), StringVar(), StringVar()
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     up_frame = Frame(win)
     path_frame = Labelframe(up_frame, text='TCX文件路径', relief=RIDGE)
     path_frame.pack(side=LEFT, expand='yes', fill='both')
-    # valueresult.set('   必选项')
+    show_wear_path.set('                                                   Required')
     Label(path_frame, text='WEAR PATH:', relief=GROOVE).grid(
         row=0, column=0, columnspan=1)
     Label(path_frame, text=' GPS PATH:  ', relief=GROOVE).grid(
@@ -333,6 +333,7 @@ if __name__ == '__main__':
     protocol_frame = LabelFrame(mid_frame, text='协议路径', relief=RIDGE)
     protocol_frame.pack(side=LEFT, expand='yes', fill='both')
     protocol_choose = StringVar()
+    protocol_choose.set('     Choose a protocol')
     protocol_combobox = Combobox(
         protocol_frame, textvariable=protocol_choose, state='readonly')
     protocol_combobox['values'] = (
