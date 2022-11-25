@@ -20,100 +20,6 @@ def timezone_change(time):
     start_time = tmp+time
     return start_time
 
-
-def allin1csv(wear_path, polar_path, gps_path, inputcsv):
-
-    whs = pd.DataFrame()
-    whs_log = logging.getLogger('log')
-    try:
-        if len(wear_path) != 0:
-            # print(wear_path,'is not null')
-            whs_log.info('WHS PATH is not null')
-            wear_tp = whs_tcx2csv(wear_path)
-            wear = pd.DataFrame(wear_tp)
-        else:
-            whs_log.info('WHS PATH is null')
-        whs = pd.concat([whs, wear], axis=1)
-        # if inputcsv:
-        #     filepath=wear_path[0:-28]
-        # filename=filepath+'Wear_{}.csv'.format(datetime.strftime(timezone_change(wear['Time'][0]),"%Y-%m-%d_%H-%M-%S"))
-        # wear.to_csv(filename)
-    except:
-        whs_log.info('WHS PATH is not available')
-        wear_path = ''
-
-    try:
-        if len(polar_path) != 0:
-            dic['log'].append('POLAR PATH is not null')
-            tmphr = {'PolarTime': [], 'PolarHR': []}
-            k = 0
-            polar_tp = polar_tcx2csv(polar_path)
-            polar = pd.DataFrame(polar_tp)
-
-            for i in range(len(whs['Time'])):
-                for j in range(k, len(polar['Time'])):
-                    if wear['Time'][i] == polar['Time'][j]:
-                        tmphr['PolarTime'].append(polar['Time'][j])
-                        tmphr['PolarHR'].append(polar['HeartRateBpm'][j])
-                        k = j+1
-                        break
-                    # 若遍历完后无匹配项，则添加空值
-                    elif j+1 == len(polar['Time']):
-                        tmphr['PolarTime'].append('')
-                        tmphr['PolarHR'].append('')
-            tmp_hr = pd.DataFrame(tmphr)
-            whs = pd.concat([whs, tmp_hr], axis=1)
-            # if inputcsv:
-            #     filename=filepath+'HR_{}.csv'.format(datetime.strftime(timezone_change(whs['Time'][0]),"%Y-%m-%d_%H-%M-%S"))
-            #     tmp_hr.to_csv(filename)
-        else:
-            dic['log'].append('POLAR PATH is null')
-    except:
-        dic['log'].append('POLAR PATH is not available')
-        polar_path = ''
-
-    try:
-        if len(gps_path) != 0:
-            dic['log'].append('GPS PATH is not null')
-            if len(gps_path) != 0:
-                tmpgps = {'GPSTime': [], 'GPSLat': [], 'GPSLon': []}
-                n = 0
-                gps_tp = gpx2csv(gps_path)
-                gps = pd.DataFrame(gps_tp)
-
-                for i in range(len(whs['Time'])):
-                    for m in range(n, len(gps['Time'])):
-                        if whs['Time'][i] == gps['Time'][m]:
-                            tmpgps['GPSTime'].append(gps['Time'][m])
-                            tmpgps['GPSLat'].append(gps['Lat'][m])
-                            tmpgps['GPSLon'].append(gps['Lon'][m])
-                            n = m+1
-                            break
-                        # 若遍历完后无匹配项，则添加空值
-                        elif m+1 == len(gps['Time']):
-                            tmpgps['GPSTime'].append('')
-                            tmpgps['GPSLat'].append('')
-                            tmpgps['GPSLon'].append('')
-                tmp_gps = pd.DataFrame(tmpgps)
-                whs = pd.concat([whs, tmp_gps], axis=1)
-                # if inputcsv:
-                #     filename=filepath+'GPS_{}.csv'.format(datetime.strftime(timezone_change(whs['Time'][0]),"%Y-%m-%d_%H-%M-%S"))
-                #     tmp_gps.to_csv(filename)
-        else:
-            dic['log'].append('GPS PATH is null')
-    except:
-        dic['log'].append('GPS PATH is not available')
-        gps_path = ''
-
-    if inputcsv:
-        # filepath=wear_path[0:-28]
-        # filepath='D:\\chenchen2\\桌面\\1\\'
-        # filename=filepath+'WHS_{}.csv'.format(datetime.strftime(timezone_change(whs['Time'][0]),"%Y-%m-%d_%H-%M-%S"))
-        filename = 'WHS_{}.csv'.format(datetime.strftime(
-            timezone_change(whs['Time'][0]), "%Y-%m-%d_%H-%M-%S"))
-        whs.to_csv(filename)
-    return whs
-
 def cal1(whs):
     hr_lap=[]
     sum_lap,sum_ape,sumd,suml=0,0,0,0
@@ -229,37 +135,13 @@ def cal2(whs):
         # dic['hr_ape'] = '{:.2%}'.format(sum_ape/len(hr_lap))
 
     # GPS distance APE、Track Accuracy AE
-    if 'GPSLat' in whs.columns:
-        sumd = 0
-        for l in range(len(whs)):
-            if datetime.strptime(whs['Time'][l], "%Y-%m-%d %H:%M:%S") > gps_start_time:
-                # GT设备无数据时，异常处理
-                if not pd.isna(float(whs['GPSLat'][l])) and not pd.isna(float(whs['GPSLat'][l-1])):
-                    distance = getDistance(float(whs['GPSLat'][l]), float(whs['GPSLon'][l]), float(whs['GPSLat'][l-1]), float(whs['GPSLon'][l-1]))
-                    sumd = sumd+distance
-                    continue
-                elif pd.isna(float(whs['GPSLat'][l])) and not pd.isna(float(whs['GPSLat'][l-1])): 
-                    for n in range(l+1,len(whs)): 
-                        if not pd.isna(float(whs['GPSLat'][n])):
-                            distance = getDistance(float(whs['GPSLat'][n]), float(whs['GPSLon'][n]), float(whs['GPSLat'][l-1]), float(whs['GPSLon'][l-1]))
-                            break
-                    sumd = sumd+distance
-                    continue
-                else:
-                # elif pd.isna(float(whs['GPSLat'][l])) and pd.isna(float(whs['GPSLat'][l-1])):
-                    continue
-                # else:
-                #     distance = getDistance(float(whs['GPSLat'][l]), float(whs['GPSLon'][l]), float(whs['GPSLat'][l+1]), float(whs['GPSLon'][l+1]))
-                #     sumd = sumd+distance
-                #         
+    if 'GPSLat' in whs.columns:        
         for m in range(len(whs)):
             if datetime.strptime(whs['Time'][m], "%Y-%m-%d %H:%M:%S") < gps_start_time:
                 dic['gps_ae'].append('')
             else:
                 lap=getDistance(float(whs['LatitudeDegrees'][m]), float(whs['LongitudeDegrees'][m]), float(whs['GPSLat'][m]), float(whs['GPSLon'][m]))
                 dic['gps_ae'].append(lap)    
-        dic['gt_dis'] = sumd
-        dic['gps_ape'].append(abs(dut_dis-sumd)/sumd)
     
     # Steps
     if 'ActiTime' in whs.columns:

@@ -1,5 +1,5 @@
 '''
-2.0 添加step path, actigraphy steps数据整合,移除结果层
+2.0 添加step path, actigraphy steps数据整合,移除结果层,修改GT DISTANCE
 1.8 添加gtx path, gps数据整合
 1.6 解决了polar心率无数据时的异常
 1.5 更新tcx元素定位xpath方法, 解决了GPS LT问题, 解决数据时间不匹配导致的无法计算问题
@@ -229,6 +229,7 @@ class whs:
         whs_log.info('***START***\n')
         whs = pd.DataFrame()
         i = 0
+        protocol_csv_name=protocol_combobox.get()
         data = {'start_time': 0, 'end_time': 0, 'hr_start_time': 0, 'hr_lock_time': [], 'hr_ae': [], 'hr_ape': [
         ], 'gps_start_time': 0, 'gps_lock_time': [], 'gps_ae': [], 'gps_ape': [], 'dut_steps': 0, 'steps_ape': [], 'dut_dis': 0, 'gt_dis': 0, 'gt_steps': 0}
 
@@ -245,8 +246,12 @@ class whs:
             whs_log.info('HR lock time: {}'.format(data['hr_lock_time'][i]))
             # 直接显示GPS相关数据: GPS Lock Time、DUT distance、GT distance、Distance APE
             if 'GPSLat' in csv.columns:
-                whs_log.info('GPS lock time: {}\nDUT distance: {}\nGT distance: {}\nDistance APE: {:.2%}'.format(
-                    data['gps_lock_time'][i], round(data['dut_dis'], 2), round(data['gt_dis'], 2), data['gps_ape'][i]))
+                if protocol_csv_name == 'Biking':
+                    whs_log.info('GPS lock time: {}\nDUT distance: {}\nGT distance: {}'.format(
+                        data['gps_lock_time'][i], round(data['dut_dis'], 2), '2648.9/3536.4'))
+                if protocol_csv_name == 'Running':
+                    whs_log.info('GPS lock time: {}\nDUT distance: {}\nGT distance: {}'.format(
+                        data['gps_lock_time'][i], round(data['dut_dis'], 2), '1522.5/1740.0'))
             # 直接显示STEP相关数据: DUT steps、GT steps、Steps APE
             if 'ActiTime' in csv.columns:
                 whs_log.info('DUT steps: {}\nGT steps: {}\nSTEP APE: {:.2%}'.format(
@@ -259,15 +264,16 @@ class whs:
         
         if 'GPSLat' in csv.columns:
             whs.insert(len(whs.columns), 'Track Accuracy AE', data['gps_ae'])
-        whs.insert(len(whs.columns), 'HR AE', data['hr_ae'])
-        whs.insert(len(whs.columns), 'HR APE', data['hr_ape'])
+        if 'PolarHR' in whs.columns:
+            whs.insert(len(whs.columns), 'HR AE', data['hr_ae'])
+            whs.insert(len(whs.columns), 'HR APE', data['hr_ape'])
         whs_log.info('\n***{} file added***\n\n'.format(len(filenames)))
 
         # TODO:90%percentile
         # print(np.percentile(array(data['gps_ae']),0.9))
         # print(whs['Track Accuracy AE'].quantile(0.9))
 
-        protocol_csv_name=protocol_combobox.get()
+        
         whs.to_csv('{}\{}.csv'.format(show_dic_path.get(),protocol_csv_name))
         whs_log.info('\n***{}\{}.csv***\n\n'.format(os.path.dirname(__file__),protocol_csv_name))
         whs_log.info('Run over and please restart whs_cal...')
@@ -276,7 +282,7 @@ class whs:
 
 if __name__ == '__main__':
     win = Tk()
-    win.title(string='WHS辅助计算2.0.8')
+    win.title(string='WHS辅助计算2.0.10')
 
     show_wear_path, show_gps_path, show_polar_path, show_step_path, show_dic_path = StringVar(
     ), StringVar(), StringVar(), StringVar(), StringVar()
